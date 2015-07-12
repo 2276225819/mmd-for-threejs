@@ -1,0 +1,390 @@
+﻿<html>
+<head>
+<meta name="viewport" content=" width=device-width,inital-scale=1.0,minimum-scale=1.0,maximun-scale=1.0,user-scalable=no" />
+<!----><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style>
+html,body{ margin:0px; padding:0px; height:100%; }
+[type='range']{ width:40px; }
+body {
+	background-color: #e84b00;
+	margin: 0px;
+}
+</style>
+<title>还没做清理 (☆ﾟ∀ﾟ) [别打开太多文件]  镜像翻转（右手坐标系?）物理效果（头发）,手机跑不动皮肤(只能看到骨架绑定) 。。。</title> 
+<script src="../build/jquery.js"></script>
+<script src="../build/three.js"></script>  
+<script src="../examples/fonts/helvetiker_bold.typeface.js"></script>
+<script src="../examples/js/controls/OrbitControls.js"></script>
+<script src="../examples/js/renderers/CanvasRenderer.js"></script>
+<script src="../examples/js/renderers/Projector.js"></script>
+<script src="../examples/js/loaders/PMDLoader.js"></script>
+<!--<script type="text/javascript" src="../../MMD.js/libs/sjis.js"></script>-->
+<script> 
+function log(title,pre)
+{ 
+	if(!log[title])
+	{
+		if(!log.id)log.id=0;
+		log.id++;
+		log[title]=true;
+	}
+	var id=log.id;
+	if(!pre)pre=1;
+	pre=parseInt(pre*100);
+	var OUT = document.getElementById('OUT'); 
+	var i=document.getElementById(id);
+	if(!i) { OUT.innerHTML+="<div id='"+id+"'></div>";i=document.getElementById(id); }
+	i.innerHTML = title+": "+pre+"%";
+	
+}
+
+window.requestAnimationFrame =  window.requestAnimationFrame || setTimeout ;
+		/*onerror=function(e){
+			alert(e); 
+		}*/
+		//console.log=function(e){  document.getElementById('OUT').innerHTML+=e+'\n'; }
+		//console.warn=function(e){document.getElementById('OUT').innerHTML+=e+'\n';}
+		
+function loadDef(me){ 
+			var loader = new THREE.PMDLoader();
+			/*   
+			loader.load('l.pmd', function (mesh) {  
+				mesh.position.x=-15;
+			    //scene.add(mesh);  
+			},function(p){
+				log('加载地面',p.position / p.total); 
+			}); 
+			*/
+			var model = 'latiao/latiaoren.pmd'; 
+			var model='Lat_miku/Lat_mikuVer2.3_Sailor_Summer.pmd';
+			var model = 'miku/miku.pmd';
+		  	loader.load(model, function (mesh) {   
+				if(window.mesh) scene.remove(window.mesh); 
+				window.mesh=mesh; 
+				
+				mesh.position.set(-99,99,99);//BUG
+				setTimeout(function(){ 
+					mesh.position.set(0,0,0);  
+				});  
+				
+				mesh.castShadow = true;
+				//mesh.receiveShadow = true; 
+		  	    //scene.scale.x = -1;
+				 //mesh.position.x=5;
+				//mesh.position.y=-15;
+			    scene.add(mesh); 	
+				
+				//mesh.children[0].position.set( ... )
+				/*
+				new function T(){
+					setTimeout(T,2000);
+					var bb=mesh.geometry.bones;
+					var bon=mesh.skeleton.bones;
+					for(var i=0;i<bb.length;i++) {
+						if(bb[i].$type==2) {
+							//var ns= bb[i].name.split("%u");
+							//for(_=0,_Str='';_<ns.length;_++) 	if(ns[_]) _Str+=eval("double_byte[0x"+ ( ns[_] )+"]");
+							//THREE.debug( "Type:"+bb[i].$type+":"   ,i,bon[i]);
+						}	
+					} 
+				}*/
+				
+				var CC=document.getElementById('CC');
+				var ti=mesh.morphTargetInfluences;
+				var ss='';
+				for (var i = 0; i < ti.length; i++)
+				{
+				    if (i % 5 == 0) ss += "!";
+				    if (i % 10 == 0) ss += "<br>";
+				    ss += "<input type='range' max=1 min=0 step=0.01 value=0  onchange='mesh.morphTargetInfluences[" + i + "]=+value'>";
+				}
+				CC.innerHTML+=ss; 
+			 
+				
+				//var helper = new THREE.SkeletonHelper( mesh );
+				//helper.material.linewidth = 2;
+				 //helper.material.opacity = 0.2;
+				 //helper.visible = true;
+				 //scene.add( helper ); 
+				//(function F(){ helper.update(); setTimeout(F,16); })();
+				
+				var file="Electric_Angel.vmd" ;
+				var file="byebye.vmd" ;
+				var file="ll.vmd" ;  
+				new THREE.VMDLoader(mesh).load(file,function(animation){   
+					animate = new THREE.MMDAnimation( mesh, animation );  
+					//animate.interpolationType=1;
+					animate.play(); 
+					animate.isPlaying = false;
+					var AU=document.getElementById('AU');
+					AU.style.display="block";
+					AU.addEventListener('playing', function(){ 
+						animate.isPlaying = true;
+					});
+					AU.addEventListener('pause',function(){ 
+						animate.isPlaying = false;
+					});
+					AU.addEventListener('seeked', function(e){ 
+
+						animate.currentTime=AU.currentTime*PRE;  
+						animate.reset();   
+					});
+				},function(p){
+					log('加载动作',p.position / p.total); 
+				});
+				(function T(){ //DEBUG
+					 setTimeout(T,500);
+					if(window.console && window.animate){
+						var a=parseInt(animate.currentTime);
+						var b=parseInt(AU.currentTime*PRE) 
+						console.log(a+"	"+(a>b?">":"<")+"	"+b);
+					}
+				});//();
+				var PRE=0.75
+/*	*/
+			},function(p){
+				log('加载模型',p.position / p.total); 
+			}); 
+		/*	
+		
+			var loader = new THREE.PMDLoader();
+			loader.load('Lat_miku/Lat_mikuVer2.3_Sailor_Summer.pmd', function (mesh) { 
+				window.mesh=mesh;
+				mesh.position.x=0;
+				mesh.position.y=-10;
+			    scene.add(mesh);  
+				
+				//var helper = new THREE.SkeletonHelper( mesh );
+				//helper.material.linewidth = 2;
+				//helper.visible = true;
+				//scene.add( helper );	
+				//setTimeout(function F(){ helper.update(); setTimeout(F,1000); }); 
+				var CC=document.getElementById('OUT');
+				var ti=mesh.morphTargetInfluences;
+				var ss='';
+				for(var i=0;i<ti.length;i++) 
+				 	ss+=" <input type='range' max=1 min=0 step=0.01 value=0  onchange='mesh.morphTargetInfluences["+i+"]=+value'> ";
+				CC.innerHTML+=ss; 
+			});*/
+	
+}
+function loadMy(me)
+{ 
+	if(me.files.length==0)alert("没有选择文件");
+	Array.prototype.forEach.call(me.files,function(file){  
+		var fns=file.name.split('.');
+		switch(fns[fns.length-1])
+		{
+			case 'bmp':
+			case 'png':
+			case 'jpg':
+			case 'jpeg':
+				THREE.ImageUtils.loadFile(file);
+				break;
+			case 'pmd':
+				new THREE.PMDLoader().loadFile(file,function(mesh){  
+					if(window.mesh) scene.remove(window.mesh); 
+					scene.add(window.mesh=mesh);  
+					mesh.receiveShadow = true;
+				});
+				break;
+			case 'vmd':
+				break; 
+		} 
+	});  
+}
+	
+		
+        onload = function () {
+            var w = window.innerWidth, h = window.innerHeight;  
+            var rend;
+			try{
+				//rend= new THREE.CanvasRenderer();
+				rend = new THREE.WebGLRenderer({antialias: true});
+			}catch(ee){
+				rend= new THREE.CanvasRenderer();
+			}
+			rend.shadowMapEnabled = true; 
+            rend.setClearColor(0xfdfdfd);
+            rend.setPixelRatio(window.devicePixelRatio);
+            rend.setSize(w, h);
+            document.body.appendChild(rend.domElement);
+            ////60deg , 1/1 , 1~100
+            window.camera = new THREE.PerspectiveCamera(60, w / h, 1, 100000);
+            camera.position.y = 30;
+            camera.position.z = -30;
+            controls = new THREE.OrbitControls(camera,rend.domElement);
+			controls.center.y=10;
+            //
+            window.scene = new THREE.Scene();
+ 
+			//var oo=new THREE.SphereGeometry(5,32,32);
+			//scene.add( new THREE.Mesh(oo));
+			
+			var clock = new THREE.Clock();
+			(function LOOP() { 
+				requestAnimationFrame( LOOP );
+				//setTimeout(LOOP);
+   				controls.update(); 
+				
+				var delta = 0.75 * clock.getDelta();
+				THREE.AnimationHandler.update( delta );
+				//if(window.helper)helper.update();
+                rend.render(scene, camera); 
+			})();
+ 
+			 
+			 
+			 
+			 
+			 
+			 
+			var loader = new THREE.PMDLoader();
+			loader.load('Lat_miku/Lat_mikuVer2.3_Sailor_Summer.pmd', function (mesh) {  
+			 
+					mesh.position.x=-10; /*
+				mesh.position.set(-99,99,99);//BUG
+				setTimeout(function(){ 
+					mesh.position.set(0,0,0); 
+					mesh.position.x=-10; 
+				}); */
+				mesh.castShadow = true;
+			    scene.add(mesh);  
+			 
+			});
+			  
+					    
+		  	var W=2;  
+					
+			//BUG之墙 ↓↓  在某个角度看人的话 在墙后面的部分会完全挡住 就是是透明的也会
+ 			scene.add( plane  = new THREE.Mesh( 
+				new THREE.PlaneBufferGeometry( 200,200, 8, 8 ),
+				new THREE.MeshPhongMaterial( {
+					opacity:0.2,
+					// side:THREE.DoubleSide, 
+					// blending: THREE.AdditiveBlending,
+      				//  depthTest: false,
+					 transparent:true,  
+				})
+			) ); 
+			plane.rotation.x= Math.PI/2; 
+			//BUG之墙 ↑↑
+		
+			
+			//可移动方块（ 都是你的锅 害了阴影出不来加上m材质就不行了
+			OBJ=new THREE.Mesh(new THREE.BoxGeometry(W,W,W,W,W,W),new THREE.MeshBasicMaterial({
+				color:0xffffff,
+				// map:THREE.ImageUtils.loadTexture("uv.jpg")
+			}));
+			
+			OBJ.position.y=5; 
+			OBJ.castShadow = true;
+			scene.add(OBJ);
+			//OBJ.receiveShadow = true;
+				/**/
+			
+			//地板
+			var geo=new THREE.BoxGeometry(W*40,W/50,W*40);
+			Ground=new THREE.Mesh(geo, new THREE.MeshPhongMaterial( { 
+				//ambient: 0x555555,
+				color: 0xffffff, 
+				//specular: 0xffffff, 
+				//shininess: 50, 
+				//shading: THREE.SmoothShading
+			 }));
+			Ground.receiveShadow = true;
+			Ground.position.y=-0.1; 
+			scene.add(Ground);
+			//Ground.castShadow = true;
+			//Box.position.x=2;
+	 	
+ 
+        light = new THREE.SpotLight(0xffffff);  
+       light.position.set( 0, 100, -100 );
+      light.target.position.set( 0, 0, 0 );
+      light.shadowCameraVisible = true;
+      light.castShadow = true;
+      scene.add( light );
+
+			rend.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			rend.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+			rend.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+ 			window.addEventListener( 'resize',function(e){ 
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix(); 
+				rend.setSize( window.innerWidth, window.innerHeight );
+				
+			} );
+			//document.getElementById('mod').onchange=
+
+        } 
+ 
+var raycaster = new THREE.Raycaster();
+		var mouse = new THREE.Vector2(),
+		offset = new THREE.Vector3(),
+		INTERSECTED, SELECTED;
+function onDocumentMouseMove( event ) { 
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+	raycaster.setFromCamera( mouse, camera );
+	var intersects = raycaster.intersectObjects( [plane] ); 
+	if ( intersects.length > 0 ) {  
+		//点击模型
+		if(!controls.enabled)
+		{ 
+			OBJ.position.copy( intersects[ 0 ].point ); 
+		}
+	
+		//document.title  = 'pointer'+ intersects.length; 
+	} else {  
+		//document.title = 'auto'; 
+	}  
+	//if(window.d=!window.d)document.title="---";
+}
+function onDocumentMouseDown( event ) { 
+	event.preventDefault();  
+	raycaster.setFromCamera( mouse, camera );
+	var intersects = raycaster.intersectObject( OBJ ); 
+	if ( intersects.length > 0 ) {  
+		//点击模型
+		
+		plane.position.copy( OBJ.position );
+		plane.lookAt( camera.position );	 
+			
+		controls.enabled = false;  
+	} 
+}
+function onDocumentMouseUp( event ) { 
+	event.preventDefault(); 
+	controls.enabled = true; 
+	if ( INTERSECTED ) {  
+		SELECTED = null; 
+	}  
+}
+
+  /*
+		window.document.ondblclick=function(){  
+			 animation.isPlaying = !animation.isPlaying;
+			 //controls.enabled=!controls.enabled;
+		}*/
+    </script>
+</head>
+<body>
+    <audio controls='controls' src="ll.mp3" id="AU" style=" position:absolute; left:0px; bottom:0px; width:100%; display:none"></audio> 
+<div id="CC" style="position:absolute; float:left;">
+<!--模型文件：<input type="file" name="mod" id="mod"><br>
+动作文件：<input type="file" name="act" id="act"><br>-->  
+    <input onClick=" THREE.IKHandler.update(1);" value="BB" type="button" />
+    <input onClick=" THREE.IKHandler.ikReset(1);" value="V" type="button" />
+    <input onClick=" THREE.IKHandler.ikInit(1);" value="O" type="button" />
+    <input onClick=" animate.root.skeleton.bones[0].rotation.y += 3.1415926 / 6" value="<" type="button" />
+    <input onClick=" animate.root.skeleton.bones[0].rotation.y -= 3.1415926 / 6" value=">" type="button"/>
+    <input onClick=" loadDef(this)"  type="button"  value="加载演示模型" > 
+	 <label  style="font-size:16px; border:1px dashed #CCCCCC; margin:5px; display:block">本地MMD：<input onChange="loadMy(this)" type="file" multiple  ></label> 
+	 <span style="font-size:12px; color:#FFB6B6;">还没做清理 (☆ﾟ∀ﾟ) [别打开太多模型和图片]</span> 
+    
+ </div>
+    <div id="OUT" style=" position:absolute; white-space:pre; font-size:12px; line-height:12px; float:left; bottom:32px"></div>
+     
+</body>
+</html>
