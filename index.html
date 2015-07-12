@@ -302,6 +302,8 @@ function loadMy(me)
         light = new THREE.SpotLight(0xffffff);  
        light.position.set( 0, 100, -100 );
       light.target.position.set( 0, 0, 0 );
+	  light.shadowMapHeight=1024;
+	  light.shadowMapWidth=1024;
       light.shadowCameraVisible = true;
       light.castShadow = true;
       scene.add( light );
